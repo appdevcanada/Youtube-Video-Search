@@ -1,0 +1,12 @@
+{
+  "name": "luissouzaYTVideo",
+  "displayName": "luissouzaYTVideo",
+  "expo": {
+    "name": "luissouzaYTVideo",
+    "slug": "luissouzaYTVideo",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
