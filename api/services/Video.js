@@ -81,6 +81,10 @@ const VideoComponent = () => {
       setLoading(false);
     } else {
       setLoadedData([]);
+      setSelectedVideoTitle("");
+      setSelectedVideoDesc("");
+      setSelectedVideoChannel("");
+      setSelectedId(null);
     }
   }
 
