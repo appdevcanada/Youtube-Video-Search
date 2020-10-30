@@ -5,8 +5,15 @@
     "name": "luissouzaYTVideo",
     "slug": "luissouzaYTVideo",
     "version": "1.0.0",
+    "sdkVersion": "39.0.0",
     "assetBundlePatterns": [
       "**/*"
     ]
+  },
+  "icon": "./assets/images/icon.png",
+  "splash": {
+    "image": "./assets/images/splash.png",
+    "resizeMode": "contain",
+    "backgroundColor": "rgb(240, 240, 240)"
   }
 }
