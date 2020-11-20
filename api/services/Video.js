@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   FlatList,
+  RefreshControl,
   StyleSheet,
   Image,
   Text,
@@ -12,6 +13,7 @@ import {
   ActivityIndicator
 } from "react-native";
 import { WebView } from "react-native-webview";
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 import { API_KEY } from "../../config/API";
 
@@ -21,6 +23,10 @@ const ytType = "video"
 const ytURL = `https://youtube.googleapis.com/youtube/v3/search?&part=snippet&order=${ytSortBy}&type=${ytType}&key=${API_KEY}&maxResults=${ytMaxRecords}&q=`;
 const ytPage = "&pageToken=";
 let pageURL = "";
+const DEVICE_ORIENTATION = Object.freeze({
+  PORTRAIT: 0,
+  LANDSCAPE: 1
+});
 
 const Item = ({ item, onPress, style, styleT }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
@@ -33,6 +39,8 @@ const VideoComponent = () => {
   const [loading, setLoading] = useState(false);
   const [loadedData, setLoadedData] = useState([]);
   const [nextPage, setNextPage] = useState(null);
+  const [inputText, setInputText] = useState("");
+  const [orientation, setOrientation] = useState(0);
   const [selectedVideoTitle, setSelectedVideoTitle] = useState("");
   const [selectedVideoDesc, setSelectedVideoDesc] = useState("");
   const [selectedVideoChannel, setSelectedVideoChannel] = useState("");
@@ -44,12 +52,12 @@ const VideoComponent = () => {
       setSelectedVideoDesc(loadedData[idx].desc);
       setSelectedVideoChannel(loadedData[idx].channel);
     }
-  }, [loading, selectedId])
+  }, [loading, selectedId, orientation])
 
-  const loadVideoList = async (query) => {
-    if (query != "") {
+  const loadVideoList = async () => {
+    if (inputText != "") {
       setLoading(true);
-      pageURL = ytURL + query;
+      pageURL = ytURL + inputText;
       await fetch(pageURL, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json;charset=utf-8' },
@@ -64,6 +72,7 @@ const VideoComponent = () => {
               newList.push({ id: resItem.id.videoId, title: resItem.snippet.title, desc: resItem.snippet.description, channel: resItem.snippet.channelTitle });
             })
             setLoadedData(newList);
+            console.log("Initial LIST", newList)
             setSelectedVideoTitle(newList[0].title);
             setSelectedVideoDesc(newList[0].desc);
             setSelectedVideoChannel(newList[0].channel);
@@ -77,7 +86,7 @@ const VideoComponent = () => {
             setSelectedId(null);
           }
         })
-        .catch(err => console.error)
+        .catch(err => console.error);
       setLoading(false);
     } else {
       setLoadedData([]);
@@ -102,6 +111,7 @@ const VideoComponent = () => {
             newList.push({ id: resItem.id.videoId, title: resItem.snippet.title, desc: resItem.snippet.description, channel: resItem.snippet.channelTitle });
           })
           setLoadedData(newList);
+          console.log("Next page LIST", newList)
         } else {
           setNextPage(null);
         }
@@ -115,6 +125,22 @@ const VideoComponent = () => {
     }
   }
 
+  const onRefresh = () => {
+    setLoading(true);
+    loadVideoList();
+    setLoading(false);
+  }
+
+  const setOrientSize = () => {
+    let actualOrientation = ScreenOrientation.getOrientationAsync();
+    if (actualOrientation === ScreenOrientation.Orientation.LANDSCAPE_LEFT || actualOrientation === ScreenOrientation.Orientation.LANDSCAPE_RIGHT) {
+      setOrientation(DEVICE_ORIENTATION.LANDSCAPE);
+    } else {
+      setOrientation(DEVICE_ORIENTATION.PORTRAIT);
+    }
+  }
+  ScreenOrientation.addOrientationChangeListener(setOrientSize);
+
   const renderItem = ({ item }) => {
     const backgroundColor = item.id === selectedId ? "rgb(197, 0, 0)" : "rgb(240, 240, 240)";
     const color = item.id === selectedId ? "rgb(240, 240, 240)" : "rgb(30, 30, 30)";
@@ -127,7 +153,8 @@ const VideoComponent = () => {
           source={{ uri: `https://i.ytimg.com/vi/${item.id}/hqdefault.jpg` }}
           style={{
             width: '20%',
-            height: 80
+            height: 80,
+            borderRadius: 5,
           }} />
         <Item
           item={item}
@@ -142,10 +169,14 @@ const VideoComponent = () => {
   return (
     <View style={styles.videoarea}>
       <View style={styles.header}>
+        <Text style={styles.apptitle}>Youtube Video Search</Text>
         <TextInput
           style={styles.search}
           placeholder="Search videos here..."
-          onChangeText={loadVideoList}>
+          returnKeyType="search"
+          value={inputText}
+          onSubmitEditing={loadVideoList}
+          onChangeText={text => setInputText(text)}>
         </TextInput>
       </View>
       {loading ? (
@@ -159,19 +190,36 @@ const VideoComponent = () => {
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
               extraData={selectedId}
+              onEndReachedThreshold={1}
               onEndReached={onEndReached}
+              refreshControl={
+                <RefreshControl
+                  refreshing={loading}
+                  onRefresh={onRefresh}
+                />
+              }
             />
             <WebView
               useWebKit={true}
               source={{ url: 'https://www.youtube.com/embed/' + selectedId }}
             />
-            <Text style={styles.bold}>Title: <Text style={styles.frame}>{selectedVideoTitle != "" ? selectedVideoTitle : "No title"}</Text></Text>
-            <Text style={styles.bold}>Description: <Text style={styles.frame}>{selectedVideoDesc != "" ? selectedVideoDesc : "No description"}</Text></Text>
-            <Text style={styles.bold}>Channel: <Text style={styles.frame}>{selectedVideoChannel != "" ? selectedVideoChannel : "No channel"}</Text></Text>
-          </View>
+            {orientation === DEVICE_ORIENTATION.PORTRAIT ? (
+              <View style={styles.bottom}>
+                <Text style={styles.bold}>Title: <Text style={styles.frame}>{selectedVideoTitle != "" ? (selectedVideoTitle.length > 42 ? selectedVideoTitle.substring(0, 42) + "..." : selectedVideoTitle) : "No title"}</Text></Text>
+                <Text style={styles.bold}>Description: <Text style={styles.frame}>{selectedVideoDesc != "" ? (selectedVideoDesc.length > 36 ? selectedVideoDesc.substring(0, 36) + "..." : selectedVideoDesc) : "No description"}</Text></Text>
+                <Text style={styles.bold}>Channel: <Text style={styles.frame}>{selectedVideoChannel != "" ? (selectedVideoChannel.length > 40 ? selectedVideoChannel.substring(0, 40) + "..." : selectedVideoChannel) : "No channel"}</Text></Text>
+              </View>
+            ) : (
+                <View style={styles.bottom}>
+                  <Text style={styles.bold}>Title: <Text style={styles.frame}>{selectedVideoTitle != "" ? (selectedVideoTitle.length > 80 ? selectedVideoTitle.substring(0, 80) + "..." : selectedVideoTitle) : "No title"}</Text></Text>
+                  <Text style={styles.bold}>Description: <Text style={styles.frame}>{selectedVideoDesc != "" ? (selectedVideoDesc.length > 79 ? selectedVideoDesc.substring(0, 79) + "..." : selectedVideoDesc) : "No description"}</Text></Text>
+                  <Text style={styles.bold}>Channel: <Text style={styles.frame}>{selectedVideoChannel != "" ? (selectedVideoChannel.length > 78 ? selectedVideoChannel.substring(0, 78) + "..." : selectedVideoChannel) : "No channel"}</Text></Text>
+                </View>
+              )}
+          </View >
         )
       }
-    </View>
+    </View >
   );
 };
 
@@ -194,12 +242,20 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
+    textAlign: 'left'
   },
   header: {
     width: '100%',
     backgroundColor: 'rgb(228, 29, 62)',
     padding: 20,
-    paddingTop: 0,
+    paddingTop: 10
+  },
+  apptitle: {
+    fontSize: 16,
+    textAlign: 'center',
+    paddingBottom: 10,
+    fontWeight: '600',
+    color: 'rgb(230, 230, 230)',
   },
   search: {
     height: 35,
@@ -222,18 +278,23 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '40%',
   },
-  frame: {
+  bottom: {
     backgroundColor: 'rgb(200, 200, 200)',
+    width: '100%',
+    padding: 5,
+  },
+  frame: {
+    color: 'rgb(30, 30, 30)',
     width: '100%',
     height: 30,
     padding: 5,
     fontWeight: 'normal',
   },
   bold: {
-    backgroundColor: 'rgb(200, 200, 200)',
     width: '100%',
     height: 30,
     padding: 5,
+    paddingLeft: 0,
     fontWeight: '600',
   }
 });
