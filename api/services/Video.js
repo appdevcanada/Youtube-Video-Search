@@ -133,8 +133,8 @@ const VideoComponent = () => {
     setLoading(false);
   }
 
-  const setOrientSize = () => {
-    let actualOrientation = ScreenOrientation.getOrientationAsync();
+  const setOrientSize = async () => {
+    let actualOrientation = await ScreenOrientation.getOrientationAsync();
     if (actualOrientation === ScreenOrientation.Orientation.LANDSCAPE_LEFT || actualOrientation === ScreenOrientation.Orientation.LANDSCAPE_RIGHT) {
       setOrientation(DEVICE_ORIENTATION.LANDSCAPE);
     } else {
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     paddingTop: 10
   },
   apptitle: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
     paddingBottom: 10,
     fontWeight: '600',
