@@ -35,7 +35,7 @@ const App = () => {
     <SafeAreaView style={styles.container}>
       {Platform.OS === 'ios' && <StatusBar backgroundColor="rgb(228, 29, 62)" barStyle="light-content" />}
       <View style={styles.videosearch}>
-        <VideoComponent></VideoComponent>
+        <VideoComponent />
       </View>
       <View style={styles.footer}>
         <Footer />
@@ -60,8 +60,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     backgroundColor: 'rgb(228, 29, 62)',
-    height: 20,
-    paddingTop: 2,
+    height: 25,
+    paddingTop: 3,
   },
 });
 

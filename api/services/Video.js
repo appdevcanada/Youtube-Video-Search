@@ -8,6 +8,7 @@ import {
   TextInput,
   View,
   Keyboard,
+  Platform,
   Dimensions,
   TouchableOpacity,
   ActivityIndicator
@@ -44,6 +45,7 @@ const VideoComponent = () => {
   const [selectedVideoTitle, setSelectedVideoTitle] = useState("");
   const [selectedVideoDesc, setSelectedVideoDesc] = useState("");
   const [selectedVideoChannel, setSelectedVideoChannel] = useState("");
+  let videoSrc = `https://www.youtube.com/embed/${selectedId}`;
 
   useEffect(() => {
     if (loadedData.length > 0) {
@@ -199,10 +201,13 @@ const VideoComponent = () => {
                 />
               }
             />
-            <WebView
-              useWebKit={true}
-              source={{ url: 'https://www.youtube.com/embed/' + selectedId }}
-            />
+            {Platform.OS === "web" ? (
+              <iframe src={videoSrc} height={'40%'} style={{ borderWidth: 0 }} />
+            ) : (
+                <WebView
+                  useWebKit={true}
+                  source={{ uri: videoSrc }}
+                />)}
             {orientation === DEVICE_ORIENTATION.PORTRAIT ? (
               <View style={styles.bottom}>
                 <Text style={styles.bold}>Title: <Text style={styles.frame}>{selectedVideoTitle != "" ? (selectedVideoTitle.length > 42 ? selectedVideoTitle.substring(0, 42) + "..." : selectedVideoTitle) : "No title"}</Text></Text>
@@ -277,6 +282,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgb(240, 240, 240)',
     width: '100%',
     height: '40%',
+    overflow: 'hidden'
   },
   bottom: {
     backgroundColor: 'rgb(200, 200, 200)',
