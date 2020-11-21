@@ -253,7 +253,9 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'rgb(228, 29, 62)',
     padding: 20,
-    paddingTop: 10
+    paddingTop: 10,
+    zIndex: 200,
+    boxShadow: '0px 1px 1px grey, 0px 3px 3px darkgrey',
   },
   apptitle: {
     fontSize: 18,
