@@ -70,4 +70,3 @@ ___
 ![iOS Screenshot 4](./assets/screenshots/iOS/ios4.png "Result Screen")	| ![Android Screenshot 4](./assets/screenshots/Android/and4.png "Video playing") |
 ![iOS Screenshot 5](./assets/screenshots/iOS/ios5.png "Video playing")	|
 ![iOS Screenshot 6](./assets/screenshots/iOS/ios6.png "Video playing") |
-![iOS Screenshot 7](./assets/screenshots/iOS/ios7.png "Landscape View") |
