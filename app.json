@@ -1,13 +1,24 @@
 {
-  "name": "luissouzaYTVideo",
-  "displayName": "luissouzaYTVideo",
+  "name": "YTSearch",
+  "displayName": "YTSearch",
   "expo": {
-    "name": "luissouzaYTVideo",
-    "slug": "luissouzaYTVideo",
+    "name": "YTSearch",
+    "slug": "Luis_Souza-YTSearch",
     "version": "1.0.0",
     "sdkVersion": "39.0.0",
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
     "assetBundlePatterns": [
       "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "platforms": [
+      "ios",
+      "android",
+      "web"
     ]
   },
   "icon": "./assets/images/icon.png",
