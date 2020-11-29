@@ -62,11 +62,11 @@ ___
 
 ## Screenshots
 
-**iOS** | **Android**
-|:---:|:---:|
-![iOS Screenshot 1](./assets/screenshots/iOS/ios1.png "Main Screen") | ![Android Screenshot 1](./assets/screenshots/Android/and1.png "Main Screen") |
-![iOS Screenshot 2](./assets/screenshots/iOS/ios2.png "Keyboard Screen")	| ![Android Screenshot 2](./assets/screenshots/Android/and2.png "Keyboard Screen") |
-![iOS Screenshot 3](./assets/screenshots/iOS/ios3.png "Result Screen")	| ![Android Screenshot 3](./assets/screenshots/Android/and3.png "Result Screen") |
+**iOS** | **Android** | **Web**
+|:---:|:---:|:---:|
+![iOS Screenshot 1](./assets/screenshots/iOS/ios1.png "Main Screen") | ![Android Screenshot 1](./assets/screenshots/Android/and1.png "Main Screen") | ![Web Screenshot 1](./assets/screenshots/Web/web1.png "Main Screen")
+![iOS Screenshot 2](./assets/screenshots/iOS/ios2.png "Keyboard Screen")	| ![Android Screenshot 2](./assets/screenshots/Android/and2.png "Keyboard Screen") | ![Web Screenshot 2](./assets/screenshots/Web/web2.png "Result Screen")
+![iOS Screenshot 3](./assets/screenshots/iOS/ios3.png "Result Screen")	| ![Android Screenshot 3](./assets/screenshots/Android/and3.png "Result Screen") | ![Web Screenshot 3](./assets/screenshots/Web/web3.png "Video playing")
 ![iOS Screenshot 4](./assets/screenshots/iOS/ios4.png "Result Screen")	| ![Android Screenshot 4](./assets/screenshots/Android/and4.png "Video playing") |
-![iOS Screenshot 5](./assets/screenshots/iOS/ios5.png "Video playing")	|
-![iOS Screenshot 6](./assets/screenshots/iOS/ios6.png "Video playing") |
+![iOS Screenshot 5](./assets/screenshots/iOS/ios5.png "Video playing")	|  |
+![iOS Screenshot 6](./assets/screenshots/iOS/ios6.png "Video playing")  |  |
