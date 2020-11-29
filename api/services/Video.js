@@ -255,7 +255,14 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 10,
     zIndex: 200,
-    boxShadow: '0px 1px 1px grey, 0px 3px 3px darkgrey',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.35,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   apptitle: {
     fontSize: 18,
