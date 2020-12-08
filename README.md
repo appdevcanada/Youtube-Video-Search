@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/images/splash.png" width="300px" alt="React Native Youtube Search App" />
+  <img src="/assets/images/splash.png" width="300px" alt="React Native Youtube Search App" />
 </p>
 
 # YTSearch - Youtube React Native App
