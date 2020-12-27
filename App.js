@@ -1,18 +1,20 @@
 import React, { useEffect } from "react";
 import {
   StyleSheet,
-  SafeAreaView,
   View,
   StatusBar,
   Platform
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Font from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
 import Footer from "./Footer";
-import VideoComponent from "./api/services/Video";
+import VideoComponent from "./components/services/Video";
 import { enableScreens } from "react-native-screens";
 
 export default App = () => {
+
   enableScreens(); // this helps screens load faster in background
 
   const loadFonts = async () => {
@@ -32,15 +34,17 @@ export default App = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      {Platform.OS === 'ios' && <StatusBar backgroundColor="rgb(228, 29, 62)" barStyle="light-content" />}
-      <View style={styles.videosearch}>
-        <VideoComponent />
-      </View>
-      <View style={styles.footer}>
-        <Footer />
-      </View>
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container} forceInset={{ top: 'always' }}>
+        {Platform.OS === 'ios' && <StatusBar backgroundColor="rgb(228, 29, 62)" barStyle="light-content" />}
+        <View style={styles.videosearch}>
+          <VideoComponent />
+        </View>
+        <View style={styles.footer}>
+          <Footer />
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

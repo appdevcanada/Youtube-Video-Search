@@ -8,6 +8,10 @@
     "test": "jest"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.32",
+    "@fortawesome/free-solid-svg-icons": "^5.15.1",
+    "@fortawesome/react-fontawesome": "^0.1.14",
+    "@fortawesome/react-native-fontawesome": "^0.2.6",
     "expo": "~39.0.2",
     "expo-screen-orientation": "~2.0.0",
     "expo-splash-screen": "~0.6.2",
@@ -19,11 +23,14 @@
     "react-native": "~0.63.3",
     "react-native-gesture-handler": "~1.7.0",
     "react-native-reanimated": "~1.13.0",
+    "react-native-safe-area-context": "3.1.4",
+    "react-native-safe-area-view": "^1.1.1",
     "react-native-screens": "~2.10.1",
     "react-native-splash-screen": "^3.2.0",
+    "react-native-svg": "^12.1.0",
     "react-native-unimodules": "~0.11.0",
     "react-native-web": "~0.13.18",
-    "react-native-webview": "^10.10.0"
+    "react-native-webview": "10.7.0"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",

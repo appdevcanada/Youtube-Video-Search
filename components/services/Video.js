@@ -1,33 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   FlatList,
   RefreshControl,
   StyleSheet,
   Image,
   Text,
-  TextInput,
   View,
   Keyboard,
   Platform,
   Dimensions,
   TouchableOpacity,
+  LayoutAnimation,
   ActivityIndicator
 } from "react-native";
 import { WebView } from "react-native-webview";
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import * as ScreenOrientation from 'expo-screen-orientation';
 
-import { API_KEY } from "../../config/API";
+import SearchVideo from "./Search";
+import * as Constants from "../../config/Settings";
 
-const ytMaxRecords = 50;
-const ytSortBy = "title";
-const ytType = "video"
-const ytURL = `https://youtube.googleapis.com/youtube/v3/search?&part=snippet&order=${ytSortBy}&type=${ytType}&key=${API_KEY}&maxResults=${ytMaxRecords}&q=`;
-const ytPage = "&pageToken=";
-let pageURL = "";
 const DEVICE_ORIENTATION = Object.freeze({
   PORTRAIT: 0,
   LANDSCAPE: 1
 });
+let pageURL = "";
 
 const Item = ({ item, onPress, style, styleT }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
@@ -35,12 +33,12 @@ const Item = ({ item, onPress, style, styleT }) => (
   </TouchableOpacity>
 );
 
-const VideoComponent = () => {
+const VideoComponent = (props) => {
   const [selectedId, setSelectedId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadedData, setLoadedData] = useState([]);
   const [nextPage, setNextPage] = useState(null);
-  const [inputText, setInputText] = useState("");
+  const [showPreview, setShowPreview] = useState(false);
   const [orientation, setOrientation] = useState(0);
   const [selectedVideoTitle, setSelectedVideoTitle] = useState("");
   const [selectedVideoDesc, setSelectedVideoDesc] = useState("");
@@ -48,18 +46,19 @@ const VideoComponent = () => {
   let videoSrc = `https://www.youtube.com/embed/${selectedId}`;
 
   useEffect(() => {
+
     if (loadedData.length > 0) {
       let idx = loadedData.findIndex(({ id }) => id === selectedId);
       setSelectedVideoTitle(loadedData[idx].title);
       setSelectedVideoDesc(loadedData[idx].desc);
       setSelectedVideoChannel(loadedData[idx].channel);
     }
-  }, [loading, selectedId, orientation])
+  }, [loading, selectedId, orientation, showPreview])
 
-  const loadVideoList = async () => {
-    if (inputText != "") {
+  const loadVideoList = async (inputText) => {
+    if (inputText !== "" && inputText !== undefined) {
       setLoading(true);
-      pageURL = ytURL + inputText;
+      pageURL = Constants.YTURL + inputText;
       await fetch(pageURL, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json;charset=utf-8' },
@@ -100,7 +99,7 @@ const VideoComponent = () => {
   }
 
   const loadMore = async () => {
-    await fetch(pageURL + ytPage + nextPage, {
+    await fetch(pageURL + Constants.YTPAGE + nextPage, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json;charset=utf-8' },
     })
@@ -168,19 +167,14 @@ const VideoComponent = () => {
     );
   };
 
+  const showVideoPreview = () => {
+    LayoutAnimation.easeInEaseOut();
+    setShowPreview(!showPreview);
+  };
+
   return (
     <View style={styles.videoarea}>
-      <View style={styles.header}>
-        <Text style={styles.apptitle}>Youtube Video Search</Text>
-        <TextInput
-          style={styles.search}
-          placeholder="Search videos here..."
-          returnKeyType="search"
-          value={inputText}
-          onSubmitEditing={loadVideoList}
-          onChangeText={text => setInputText(text)}>
-        </TextInput>
-      </View>
+      <SearchVideo onSearchVideo={loadVideoList} />
       {loading ? (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color="rgb(228, 29, 62)" />
@@ -191,6 +185,7 @@ const VideoComponent = () => {
               data={loadedData}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
               extraData={selectedId}
               onEndReachedThreshold={1}
               onEndReached={onEndReached}
@@ -201,30 +196,40 @@ const VideoComponent = () => {
                 />
               }
             />
-            {Platform.OS === "web" ? (
-              <iframe src={videoSrc} height={'40%'} style={{ borderWidth: 0 }} />
-            ) : (
-                <WebView
-                  useWebKit={true}
-                  source={{ uri: videoSrc }}
-                />)}
-            {orientation === DEVICE_ORIENTATION.PORTRAIT ? (
-              <View style={styles.bottom}>
-                <Text style={styles.bold}>Title: <Text style={styles.frame}>{selectedVideoTitle != "" ? (selectedVideoTitle.length > 42 ? selectedVideoTitle.substring(0, 42) + "..." : selectedVideoTitle) : "No title"}</Text></Text>
-                <Text style={styles.bold}>Description: <Text style={styles.frame}>{selectedVideoDesc != "" ? (selectedVideoDesc.length > 36 ? selectedVideoDesc.substring(0, 36) + "..." : selectedVideoDesc) : "No description"}</Text></Text>
-                <Text style={styles.bold}>Channel: <Text style={styles.frame}>{selectedVideoChannel != "" ? (selectedVideoChannel.length > 40 ? selectedVideoChannel.substring(0, 40) + "..." : selectedVideoChannel) : "No channel"}</Text></Text>
-              </View>
-            ) : (
-                <View style={styles.bottom}>
-                  <Text style={styles.bold}>Title: <Text style={styles.frame}>{selectedVideoTitle != "" ? (selectedVideoTitle.length > 80 ? selectedVideoTitle.substring(0, 80) + "..." : selectedVideoTitle) : "No title"}</Text></Text>
-                  <Text style={styles.bold}>Description: <Text style={styles.frame}>{selectedVideoDesc != "" ? (selectedVideoDesc.length > 79 ? selectedVideoDesc.substring(0, 79) + "..." : selectedVideoDesc) : "No description"}</Text></Text>
-                  <Text style={styles.bold}>Channel: <Text style={styles.frame}>{selectedVideoChannel != "" ? (selectedVideoChannel.length > 78 ? selectedVideoChannel.substring(0, 78) + "..." : selectedVideoChannel) : "No channel"}</Text></Text>
+            <View style={showPreview ? (orientation === DEVICE_ORIENTATION.PORTRAIT ? styles.displayvideo : styles.displayvideoLandscape) : (orientation === DEVICE_ORIENTATION.PORTRAIT ? styles.hidevideo : styles.hidevideoLandscape)}>
+              <View style={{ flex: 1 }}>
+                <View style={styles.toucharea}>
+                  <TouchableOpacity onPress={showVideoPreview} hitSlop={{ top: 20, left: 150, bottom: 20, right: 150 }}>
+                    <FontAwesomeIcon icon={showPreview ? faChevronDown : faChevronUp} size={32} style={styles.chevron} />
+                  </TouchableOpacity>
                 </View>
-              )}
-          </View >
+                {Platform.OS !== "web" ?
+                  (<WebView
+                    useWebKit={true}
+                    source={{ uri: videoSrc }}
+                  />
+                  ) : (
+                    <iframe src={videoSrc} height={'100%'} style={{ borderWidth: 0 }} />
+                  )}
+              </View>
+              {orientation === DEVICE_ORIENTATION.PORTRAIT ? (
+                <View style={styles.bottom}>
+                  <Text style={styles.bold}>Title: <Text style={styles.frame}>{selectedVideoTitle != "" ? (selectedVideoTitle.length > 42 ? selectedVideoTitle.substring(0, 42) + "..." : selectedVideoTitle) : "No title"}</Text></Text>
+                  <Text style={styles.bold}>Description: <Text style={styles.frame}>{selectedVideoDesc != "" ? (selectedVideoDesc.length > 36 ? selectedVideoDesc.substring(0, 36) + "..." : selectedVideoDesc) : "No description"}</Text></Text>
+                  <Text style={styles.bold}>Channel: <Text style={styles.frame}>{selectedVideoChannel != "" ? (selectedVideoChannel.length > 40 ? selectedVideoChannel.substring(0, 40) + "..." : selectedVideoChannel) : "No channel"}</Text></Text>
+                </View>
+              ) : (
+                  <View style={styles.bottom}>
+                    <Text style={styles.bold}>Title: <Text style={styles.frame}>{selectedVideoTitle != "" ? (selectedVideoTitle.length > 80 ? selectedVideoTitle.substring(0, 80) + "..." : selectedVideoTitle) : "No title"}</Text></Text>
+                    <Text style={styles.bold}>Description: <Text style={styles.frame}>{selectedVideoDesc != "" ? (selectedVideoDesc.length > 79 ? selectedVideoDesc.substring(0, 79) + "..." : selectedVideoDesc) : "No description"}</Text></Text>
+                    <Text style={styles.bold}>Channel: <Text style={styles.frame}>{selectedVideoChannel != "" ? (selectedVideoChannel.length > 78 ? selectedVideoChannel.substring(0, 78) + "..." : selectedVideoChannel) : "No channel"}</Text></Text>
+                  </View>
+                )}
+            </View>
+          </View>
         )
       }
-    </View >
+    </View>
   );
 };
 
@@ -236,7 +241,7 @@ const styles = StyleSheet.create({
   },
   loader: {
     justifyContent: 'center',
-    paddingTop: '85%',
+    paddingTop: '80%',
   },
   item: {
     padding: 10,
@@ -249,40 +254,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'left'
   },
-  header: {
-    width: '100%',
-    backgroundColor: 'rgb(228, 29, 62)',
-    padding: 20,
-    paddingTop: 10,
-    zIndex: 200,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.35,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  apptitle: {
-    fontSize: 18,
-    textAlign: 'center',
-    paddingBottom: 10,
-    fontWeight: '600',
-    color: 'rgb(230, 230, 230)',
-  },
-  search: {
-    height: 35,
-    backgroundColor: 'rgb(240, 240, 240)',
-    color: 'rgb(30, 30, 30)',
-    padding: 9,
-    fontSize: 16,
-    borderRadius: 5,
-  },
   searchlist: {
     flex: 1,
     backgroundColor: 'rgb(240, 240, 240)',
     padding: 10,
+    zIndex: 200,
     width: '100%',
     height: Dimensions.get('window').height / 2.5
   },
@@ -291,7 +267,63 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgb(240, 240, 240)',
     width: '100%',
     height: '40%',
-    overflow: 'hidden'
+    overflow: 'hidden',
+  },
+  displayvideo: {
+    flex: 1,
+    width: '100%',
+    zIndex: 200,
+    shadowColor: 'rgb(10, 10, 10)',
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 1,
+  },
+  displayvideoLandscape: {
+    flex: 4,
+    width: '100%',
+    zIndex: 200,
+    shadowColor: 'rgb(10, 10, 10)',
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 1,
+  },
+  hidevideo: {
+    flex: 1,
+    width: '100%',
+    zIndex: 200,
+    shadowColor: 'rgb(10, 10, 10)',
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 1,
+    position: 'absolute',
+    top: '95.5%'
+  },
+  hidevideoLandscape: {
+    flex: 1,
+    width: '100%',
+    zIndex: 200,
+    shadowColor: 'rgb(10, 10, 10)',
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 1,
+    position: 'absolute',
+    top: '89%'
   },
   bottom: {
     backgroundColor: 'rgb(200, 200, 200)',
@@ -311,7 +343,19 @@ const styles = StyleSheet.create({
     padding: 5,
     paddingLeft: 0,
     fontWeight: '600',
-  }
+  },
+  toucharea: {
+    width: '100%',
+    backgroundColor: 'rgb(230, 230, 230)',
+    minHeight: 30,
+    opacity: 0.7,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  chevron: {
+    width: '100%',
+    color: 'rgb(150, 150, 150)',
+  },
 });
 
 export default VideoComponent;
