@@ -50,11 +50,11 @@ This app uses the following technologies/libraries:
 
 ## Contributing
 
-Fell free to clone this repository and contribute with more functionality, new ideas and improvements.
+Feel free to clone this repository and contribute with more functionalities, new ideas and improvements.
 
 ```shell
-git clone https://github.com/appdevcanada/Near-You-Restaurants-Yelp.git rn-resto-yelp
-cd rn-resto-yelp
+git clone https://github.com/appdevcanada/Youtube-Video-Search.git rn-ytsearch
+cd rn-ytsearch
 npm install
 expo start
 ```
