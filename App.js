@@ -8,6 +8,7 @@ import {
 import SafeAreaView from 'react-native-safe-area-view';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Font from "expo-font";
+import { Asset } from 'expo-asset';
 import { Ionicons } from "@expo/vector-icons";
 import Footer from "./Footer";
 import VideoComponent from "./components/services/Video";
