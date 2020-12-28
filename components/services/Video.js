@@ -6,6 +6,7 @@ import {
   Image,
   Text,
   View,
+  Alert,
   Keyboard,
   Platform,
   Dimensions,
@@ -14,18 +15,24 @@ import {
   ActivityIndicator
 } from "react-native";
 import { WebView } from "react-native-webview";
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import * as ScreenOrientation from 'expo-screen-orientation';
 
 import SearchVideo from "./Search";
-import * as Constants from "../../config/Settings";
+import * as GlobalConstants from "../../config/Settings";
 
 const DEVICE_ORIENTATION = Object.freeze({
   PORTRAIT: 0,
   LANDSCAPE: 1
 });
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const topPortrait = (SCREEN_HEIGHT > SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH) * 0.738;
+const topLandscape = (SCREEN_HEIGHT > SCREEN_WIDTH ? SCREEN_WIDTH : SCREEN_HEIGHT) * 0.580;
+const topLandscapeWeb = SCREEN_HEIGHT * 0.795;
 let pageURL = "";
+let searchString = "";
 
 const Item = ({ item, onPress, style, styleT }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
@@ -55,10 +62,28 @@ const VideoComponent = (props) => {
     }
   }, [loading, selectedId, orientation, showPreview])
 
+  const errorAlert = () =>
+    Alert.alert(
+      "Search Error",
+      "No records found for this search",
+      [
+        {
+          text: "Retry",
+          onPress: () => loadVideoList(searchString)
+        },
+        {
+          text: "OK", onPress: () => console.log("Error: OK Pressed"),
+          style: "default"
+        }
+      ],
+      { cancelable: false }
+    );
+
   const loadVideoList = async (inputText) => {
     if (inputText !== "" && inputText !== undefined) {
+      searchString = inputText;
       setLoading(true);
-      pageURL = Constants.YTURL + inputText;
+      pageURL = GlobalConstants.YTURL + inputText;
       await fetch(pageURL, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json;charset=utf-8' },
@@ -83,11 +108,14 @@ const VideoComponent = (props) => {
             setSelectedVideoTitle("");
             setSelectedVideoDesc("");
             setSelectedVideoChannel("");
-            alert('No records found for this search');
+            errorAlert();
             setSelectedId(null);
           }
         })
-        .catch(err => console.error);
+        .catch(err => {
+          console.error;
+          errorAlert();
+        });
       setLoading(false);
     } else {
       setLoadedData([]);
@@ -99,7 +127,7 @@ const VideoComponent = (props) => {
   }
 
   const loadMore = async () => {
-    await fetch(pageURL + Constants.YTPAGE + nextPage, {
+    await fetch(pageURL + GlobalConstants.YTPAGE + nextPage, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json;charset=utf-8' },
     })
@@ -117,7 +145,10 @@ const VideoComponent = (props) => {
           setNextPage(null);
         }
       })
-      .catch(err => console.error)
+      .catch(err => {
+        console.error;
+        errorAlert();
+      });
   }
 
   const onEndReached = () => {
@@ -128,7 +159,7 @@ const VideoComponent = (props) => {
 
   const onRefresh = () => {
     setLoading(true);
-    loadVideoList();
+    loadVideoList(searchString);
     setLoading(false);
   }
 
@@ -197,20 +228,17 @@ const VideoComponent = (props) => {
               }
             />
             <View style={showPreview ? (orientation === DEVICE_ORIENTATION.PORTRAIT ? styles.displayvideo : styles.displayvideoLandscape) : (orientation === DEVICE_ORIENTATION.PORTRAIT ? styles.hidevideo : styles.hidevideoLandscape)}>
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, backgroundColor: 'transparent' }}>
                 <View style={styles.toucharea}>
                   <TouchableOpacity onPress={showVideoPreview} hitSlop={{ top: 20, left: 150, bottom: 20, right: 150 }}>
                     <FontAwesomeIcon icon={showPreview ? faChevronDown : faChevronUp} size={32} style={styles.chevron} />
                   </TouchableOpacity>
                 </View>
                 {Platform.OS !== "web" ?
-                  (<WebView
+                  <WebView
                     useWebKit={true}
                     source={{ uri: videoSrc }}
-                  />
-                  ) : (
-                    <iframe src={videoSrc} height={'100%'} style={{ borderWidth: 0 }} />
-                  )}
+                  /> : <iframe src={videoSrc} height={'100%'} style={{ borderWidth: 0 }} />}
               </View>
               {orientation === DEVICE_ORIENTATION.PORTRAIT ? (
                 <View style={styles.bottom}>
@@ -260,7 +288,7 @@ const styles = StyleSheet.create({
     padding: 10,
     zIndex: 200,
     width: '100%',
-    height: Dimensions.get('window').height / 2.5
+    height: SCREEN_HEIGHT / 2.5
   },
   playvideo: {
     flex: 1,
@@ -273,57 +301,27 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     zIndex: 200,
-    shadowColor: 'rgb(10, 10, 10)',
-    shadowOffset: {
-      width: 0,
-      height: -4,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 1,
   },
   displayvideoLandscape: {
     flex: 4,
     width: '100%',
     zIndex: 200,
-    shadowColor: 'rgb(10, 10, 10)',
-    shadowOffset: {
-      width: 0,
-      height: -4,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 1,
   },
   hidevideo: {
     flex: 1,
     width: '100%',
     zIndex: 200,
-    shadowColor: 'rgb(10, 10, 10)',
-    shadowOffset: {
-      width: 0,
-      height: -4,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 1,
     position: 'absolute',
-    top: '95.5%'
+    top: Platform.OS !== 'web' ? topPortrait : topLandscapeWeb,
+    backgroundColor: 'transparent'
   },
   hidevideoLandscape: {
     flex: 1,
     width: '100%',
     zIndex: 200,
-    shadowColor: 'rgb(10, 10, 10)',
-    shadowOffset: {
-      width: 0,
-      height: -4,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 1,
     position: 'absolute',
-    top: '89%'
+    top: topLandscape,
+    backgroundColor: 'transparent'
   },
   bottom: {
     backgroundColor: 'rgb(200, 200, 200)',
@@ -346,15 +344,25 @@ const styles = StyleSheet.create({
   },
   toucharea: {
     width: '100%',
-    backgroundColor: 'rgb(230, 230, 230)',
+    backgroundColor: 'rgb(228, 174, 182)',
     minHeight: 30,
     opacity: 0.7,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    shadowColor: 'rgb(10, 10, 10)',
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 1,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10
   },
   chevron: {
     width: '100%',
-    color: 'rgb(150, 150, 150)',
+    color: 'rgb(100, 100, 100)',
   },
 });
 

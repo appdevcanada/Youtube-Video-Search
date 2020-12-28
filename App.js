@@ -13,7 +13,7 @@ import Footer from "./Footer";
 import VideoComponent from "./components/services/Video";
 import { enableScreens } from "react-native-screens";
 
-export default App = () => {
+const App = () => {
 
   enableScreens(); // this helps screens load faster in background
 
@@ -68,3 +68,5 @@ const styles = StyleSheet.create({
     paddingTop: 3,
   },
 });
+
+export default App;

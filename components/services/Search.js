@@ -28,6 +28,7 @@ const SearchVideo = ({ onSearchVideo }) => {
       <Text style={styles.apptitle}>YouTube Video Search</Text>
       <TextInput
         style={styles.search}
+        clearButtonMode={'while-editing'}
         placeholder="Search videos here..."
         returnKeyType="search"
         value={inputText}
