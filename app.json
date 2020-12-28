@@ -12,6 +12,12 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "icon": "./assets/images/icon.png",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F1F2F2"
+    },
     "ios": {
       "supportsTablet": true
     },
@@ -20,11 +26,5 @@
       "android",
       "web"
     ]
-  },
-  "icon": "./assets/images/icon.png",
-  "splash": {
-    "image": "./assets/images/splash.png",
-    "resizeMode": "contain",
-    "backgroundColor": "rgb(240, 240, 240)"
   }
 }

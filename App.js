@@ -8,11 +8,16 @@ import {
 import SafeAreaView from 'react-native-safe-area-view';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Font from "expo-font";
-import { Asset } from 'expo-asset';
+import * as SplashScreen from 'expo-splash-screen';
 import { Ionicons } from "@expo/vector-icons";
 import Footer from "./Footer";
 import VideoComponent from "./components/services/Video";
 import { enableScreens } from "react-native-screens";
+
+// Prevent native splash screen from autohiding before App component declaration
+SplashScreen.preventAutoHideAsync()
+  .then(result => console.log(`SplashScreen.preventAutoHideAsync() succeeded: ${result}`))
+  .catch(console.warn); // it's good to explicitly catch and inspect any error
 
 const App = () => {
 
@@ -31,13 +36,25 @@ const App = () => {
   };
 
   useEffect(() => {
-    loadFonts();
+    // Prevent native splash screen from autohiding
+    try {
+      loadFonts();
+    } catch (e) {
+      console.warn(e);
+    } finally {
+      // Hides native splash screen after 2s
+      setTimeout(async () => {
+        await SplashScreen.hideAsync();
+      }, 2000);
+    }
   }, []);
+
+
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container} forceInset={{ top: 'always' }}>
-        {Platform.OS === 'ios' && <StatusBar backgroundColor="rgb(228, 29, 62)" barStyle="light-content" />}
+        <StatusBar backgroundColor="rgb(228, 29, 62)" barStyle="light-content" />
         <View style={styles.videosearch}>
           <VideoComponent />
         </View>

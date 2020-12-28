@@ -30,7 +30,7 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const topPortrait = (SCREEN_HEIGHT > SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH) * (Platform.OS == "android" ? 0.7 : 0.738);
 const topLandscape = (SCREEN_HEIGHT > SCREEN_WIDTH ? SCREEN_WIDTH : SCREEN_HEIGHT) * 0.580;
-const topLandscapeWeb = SCREEN_HEIGHT * 0.795;
+const topLandscapeWeb = SCREEN_HEIGHT * 0.81;
 let pageURL = "";
 let searchString = "";
 
