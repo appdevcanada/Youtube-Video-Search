@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import {
   StyleSheet,
-  View,
   StatusBar,
   Platform
 } from 'react-native';
@@ -11,7 +10,7 @@ import * as Font from "expo-font";
 import * as SplashScreen from 'expo-splash-screen';
 import { Ionicons } from "@expo/vector-icons";
 import Footer from "./Footer";
-import VideoComponent from "./components/services/Video";
+import VideoList from "./components/services/VideoList";
 import { enableScreens } from "react-native-screens";
 
 // Prevent native splash screen from autohiding before App component declaration
@@ -42,25 +41,20 @@ const App = () => {
     } catch (e) {
       console.warn(e);
     } finally {
-      // Hides native splash screen after 2s
-      setTimeout(async () => {
+      // Hides native splash screen after 1.5s
+      let timeout = setTimeout(async () => {
         await SplashScreen.hideAsync();
-      }, 2000);
+      }, 1500);
+      return () => clearTimeout(timeout);
     }
   }, []);
-
-
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container} forceInset={{ top: 'always' }}>
         <StatusBar backgroundColor="rgb(228, 29, 62)" barStyle="light-content" />
-        <View style={styles.videosearch}>
-          <VideoComponent />
-        </View>
-        <View style={styles.footer}>
-          <Footer />
-        </View>
+        <VideoList />
+        <Footer />
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -72,18 +66,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgb(228, 29, 62)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  videosearch: {
-    flex: 1,
-    backgroundColor: 'rgb(240, 240, 240)',
-    width: '100%',
-  },
-  footer: {
-    alignItems: 'center',
-    width: '100%',
-    backgroundColor: 'rgb(228, 29, 62)',
-    height: 25,
-    paddingTop: 3,
   },
 });
 
