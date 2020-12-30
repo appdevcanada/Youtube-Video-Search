@@ -101,6 +101,7 @@ const VideoList = () => {
             setSelectedVideoChannel("");
             errorAlert();
             setSelectedId(null);
+            setSelectedIndex(0)
           }
         })
         .catch(err => {
@@ -114,6 +115,7 @@ const VideoList = () => {
       setSelectedVideoDesc("");
       setSelectedVideoChannel("");
       setSelectedId(null);
+      setSelectedIndex(0)
     }
   }
 
